@@ -95,9 +95,9 @@ A computer program is a passive collection of instructions, while a process is t
 - [[https://en.wikipedia.org/wiki/Process_(computing)][Process (computing)]]
 #+END_QUOTE
 
-We're talking about LIVING, BREATHING, PROCESSES PEOPLE. It's beautiful. Processes are identified by ~PID~s -- Process ID's. Have you ever had to force quit a program? Maybe your browser froze, so you opened your task manager or activity monitor and forced a process to end. The equivalent of doing that in the terminal is to send a message to kill a process. If I type "kill 93835" it's going to kill something -- Google Chrome to be exact (or at least, /a tab in google chrome/ becasue each tab lives in it's /own/ process).
+We're talking about LIVING, BREATHING, PROCESSES PEOPLE. It's beautiful. Processes are identified by a ~PID~ -- a process id. Have you ever had to force quit a program? Maybe your browser froze, so you opened your task manager or activity monitor and forced a process to end. The equivalent of doing that in the terminal is to send a message to kill a process. If I type ~kill 93835~ it's going to kill something -- Google Chrome to be exact (or at least, /a tab in google chrome/ becasue each tab lives in it's /own/ process).
 
-By the way, I DID type in kill 93835 WITHOUT knowing what it was (because I live recklessly). Then this notification showed up:
+By the way, I DID type in ~kill 93835~ WITHOUT knowing what it was (because I live recklessly). Then this notification showed up:
 
 
 #+ATTR_HTML: :style margin-left: auto; margin-right: auto;
@@ -166,7 +166,7 @@ int main () {
     // Let's make that cake. I mean thread.
     rdata = pthread_create(&myThread, NULL, takeNap, (void *) 1);
 
-    // Let's check in case our new threads returns an error code.
+    // Let's check in case our new thread returns an error code.
     if (rdata) {
         printf("ERROR: pthread_create() returned an error code of %d\n", rdata);
         exit(-1);
@@ -197,7 +197,7 @@ I see 3 cool hats
 I see 4 cool hats
 #+END_SRC
 
-Wow, so beautiful. Can't stop crying at this. Do you see how two things are happening in parallel? Our ~main()~ function (which is the default single thread of a program) is counting how many cool hats it sees. (4! Four C00L hats believe it or not!). While counting away at some sickening hats, a thread has shot off from the main function and is doing it's own thing -- running the function "takeNap".
+Wow, so beautiful. Can't stop crying at this. Do you see how two things are happening in parallel? Our ~main()~ function (which is the default single thread of a program) is counting how many cool hats it sees. (4! Four C00L hats believe it or not!). While counting away at some sickening hats, a thread has shot off from the main function and is doing it's own thing -- running the function ~takeNap~.
 
 I've peppered in a bunch of ~sleep()~ functions everywhere to make things more evident if you were to run this on your machine. ~sleep~ pauses the execution of /a thread/ for a certain duration.
 
@@ -231,16 +231,16 @@ Thread Routines
 To me, that doesn't read super easily. Let's dig in. Things inbetween ~<~ ~>~ are arguments to the pthread_create function:
 
 
-<pthread_t *thread>
+*<pthread_t *thread>*
 This was the unique thread we declared ("myThread")
 
-<const pthread_att_t *attr>
+*<const pthread_att_t *attr>*
 An object housing configuration details for the creation of our thread.
 
-<start_routine>
+*<start_routine>*
 The function we want the thread to start once it's created.
 
-<arg>
+*<arg>*
 We can pass a single argument to the starting routine (or NULL)
 
 
@@ -248,14 +248,13 @@ We can pass a single argument to the starting routine (or NULL)
 
 So you noticed that I haven't given you my definition of a thread. I'm not going to lie; putting the concept of a thread into [[https://stackoverflow.com/questions/5201852/what-is-a-thread-really][simplified and concrete]] terms is difficult. Currently, at my level of understanding, I don't think I can describe the literal and physical characteristics of a thread; for now  analogy and metaphor serves me better for my own understanding.
 
-I like the idea of Google Docs as a metaphor for threads. In a Google Doc there is the ability for multiple people to edit a document's contents simulataneously (what a feat!). One person may have created the doc (the main thread from the program itself), but they invited 6 other people (created 6 threads) to read and *edit* the document (and in real-time!).
-
+I like the idea of Google Docs as a metaphor for threads. In a Google Doc there is the ability for multiple people to edit a document's contents simulataneously (what a feat!). One person may have created the doc (the main thread from the program itself), but they invited 6 other people (created 6 threads) to read and *edit* the document (and in real-time!). Each person has access to the contents (data) of the Google Doc, and can make changes.
 
 I see threads as being closely linked with functions. When we created a thread above, we tied it's execution /to/ a function. Kicking off a thread resulted in a function being invoked; it's just that /that/ function was able to run at the same time as the execution of other code. This thread-function can run in parallel to other code, and like other functions, is able to access it's own local state; global state, and do all the other cool things that functions do.
 
 ** When would I use threads? Why would I want to write a multi-threaded program?
 
-Generally, to build faster programs.
+Generally, you'd use threads to build faster programs.
 
 Threads enable you to do parallel programming. You can make programs that run faster on hardware with multiple cores. Picking when you do / don't need to take advantages of threads is a case by case scenario, and generally something you want to carefully consider (see "why is it often difficult to write multi-threaded programs?" ahead).
 
@@ -266,7 +265,7 @@ Here are a handful of places you might find threads being used:
 
 *** A shift towards parallel programming as a standard?
 
-In general, multi-core programming has been gaining a lot of interest (as well as languages that purport to make it easier to write / maintain than it has been in the past). In 2005 Herb Sutter published "The Free Lunch Is Over: A Fundamental Turn Toward Concurrency in Software" which details a prescient acknowledgement of coming changes:
+In general, multi-core programming has been gaining a lot of interest (as well as languages that purport to make it easier to write / maintain parallel programs than it has been in the past). In 2005 Herb Sutter published "The Free Lunch Is Over: A Fundamental Turn Toward Concurrency in Software" which details a prescient acknowledgement of coming changes:
 
 #+BEGIN_QUOTE
 "If you’re a software developer, chances are that you have already been riding the “free lunch” wave of desktop computer performance. Is your application’s performance borderline for some local operations? “Not to worry,” the conventional (if suspect) wisdom goes; “tomorrow’s processors will have even more throughput, and anyway today’s applications are increasingly throttled by factors other than CPU throughput and memory speed (e.g., they’re often I/O-bound, network-bound, database-bound).” Right?
@@ -335,11 +334,11 @@ There's a race condition here! In the small program above, we have some global, 
 
 *** Shared mutable state
 
-From what I've gathered reading and listening, shared mutable state is often at the root of the difficulties surrounding concurrent programming. To me "shared mutable state" means "data that can and will change over time". Your definition may vary.
+From what I've gathered reading and listening, shared mutable state is often at the root of the difficulties surrounding concurrent programming. I think of "shared mutable state" as data structure that can be overwritten, changed, or altered from anywhere in your program. In contrast, immutable data is data that will never be changed -- any "alterations" would involve creating "clones" of data with whatever changes made in the new copy. Your definition may vary. I like this [[ https://benmccormick.org/2016/06/04/what-are-mutable-and-immutable-data-structures-2/][brief post]] describing the differences between mutable and immutable objects in Javascript.
 
 In the example above, we have ~num_rings~ -- a piece of data that stores a number intended to increment. That piece of /state/ (or data) /mutates/ (or changes) over time. Data and how it changes is what makes our programs non-trivial, and furthermore, the introduction of making and instructing change to happen in /parallel/ is where things become difficult.
 
-Many programming languages offer abstractions over handling parallel programming. You've already seen syntactic difference in how languages like Go handles concurrency compared to C; but behind these special grammers are powerful ideas and abstractions. Some popular abstractions/methodologies for performing parallep programming include CSP (communicating sequential processing) the Actor model, Software Transactional Memory.
+Many programming languages offer abstractions over handling parallel programming. You've already seen syntactic difference in how languages like Go handles concurrency compared to C; but behind these special grammers are powerful ideas and abstractions. Some popular abstractions/methodologies for performing parallel programming include CSP (communicating sequential processing) the Actor model, Software Transactional Memory.
 
 ** Concurrency Models (CSP, Actor Model, STM)
 
