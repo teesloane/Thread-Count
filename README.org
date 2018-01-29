@@ -344,19 +344,23 @@ Many programming languages offer abstractions over handling parallel programming
 
 Each of these topics could probably warrant a whole book written on them, and so I think I can only afford myself a shallow dive into some examples of these concurrency models (for now).
 
-NB: /While I remain uninformed on these topics I'd like to at least (for my own curiousity) lean on listing some references. Seeing that this is a personal, living breathing document charting my own understanding, the following notes will likely change as I learn more and gather experience./
+NB: /I'm still learning a lot about these topics, so for now I'd like to at least (for my own curiousity) lean more on references and documentation examples. Seeing that this is a personal, living breathing document charting my own understanding, the following notes will likely change as I learn more and gather experience./
 
-At least for my own curiousity, I'd like to explore a) a brief description/history of the concurrency model, b) post some kind of a code example (ideally, writing my own.)
+At the very least, let's look at a) some brief history/descriptions of each concurrency model and b) find some basic code examples.
 
 *** Actor Model
 
-Abstractly: I've mostly heard of the actor model in reference to Erlang and Elixir. I think Erlang is probably the most common / popular example of the Actor concurrency model and seem to be lauded as a powerful solution for building distributed and fault tolerant systems. But these are just things that I've heard! I have never written an erlang program, let alone a parallel one.
+Abstractly: I've mostly heard of the actor model in reference to Erlang / Elixir and Scala. I think Erlang is probably the most common / popular example of the Actor concurrency model and seem to be lauded as a powerful solution for building distributed and fault tolerant systems. But these are just things that I've heard! I have never written an erlang or elixir program, let alone a parallel one.
+
+*Background Info*
 
 The wikipedia page for the [[https://en.wikipedia.org/wiki/Actor_model][Actor Model]] hits us with this as it's introduction:
 
 #+BEGIN_QUOTE
 The actor model in computer science is a mathematical model of concurrent computation that treats "actors" as the universal primitives of concurrent computation. In response to a message that it receives, an actor can: make local decisions, create more actors, send more messages, and determine how to respond to the next message received. Actors may modify their own private state, but can only affect each other through messages (avoiding the need for any locks).
 #+END_QUOTE
+
+Neat. I've just noticed the mention of the word "lock" now, which seems to be something I've gotten by without understanding until now. It will remain in a bit of a fuzzy state and perhaps be visited later in an advanced section. For now let's continue with Actors.
 
 This post [[http://www.brianstorti.com/the-actor-model/]["The actor model in 10 minutes"]] kicks off by stating that:
 
@@ -367,13 +371,55 @@ The idea is very similar to what we have in object-oriented languages: An object
 The main difference is that actors are completely isolated from each other and they will never share memory. It’s also worth noting that an actor can maintain a private state that can never be changed directly by another actor.
 #+END_QUOTE
 
-This idea of actors as "primitive" units of ... something, makes me feel like they are a core "thing", native to a programming language like a STRING or an INT.
+This idea of actors as "primitive" units of ... /something/, makes me feel like they are a core "thing", native to a programming language like a STRING or an INT.
+
+Here's an intriguing excerpt from the elixir docs on getting started with [[https://elixir-lang.org/getting-started/processes.html][processes and concurrency]]:
+
+#+BEGIN_QUOTE
+In Elixir, all code runs inside processes. Processes are isolated from each other, run concurrent to one another and communicate via message passing. Processes are not only the basis for concurrency in Elixir, but they also provide the means for building distributed and fault-tolerant programs.
+
+Elixir’s processes should not be confused with operating system processes. Processes in Elixir are extremely lightweight in terms of memory and CPU (unlike threads in many other programming languages). Because of this, it is not uncommon to have tens or even hundreds of thousands of processes running simultaneously
+#+END_QUOTE
+
+It's particularly interesting that we are not working with concurrency by using something directly corresponding to the hardware of a computer (ie; posix threads). These "processes", which although they sound similar to thread, are existing only inside the Erlang virtual machine. It's easy to mix up processes in Elixir vs the processes discussed earlier, so I'll try my best not to do so.
+
+In Elixir the simplest way to work with concurrency primitives is to use the ~spawn~ function. The following is directly from the [[https://elixir-lang.org/getting-started/processes.html][Elixir docs]]:
+
+#+BEGIN_SRC Elixir
+spawn fn -> 1 + 2 end
+# #PID<0.43.0>
+#+END_SRC
+
+The following example is intended to be executed in the shell, but I've removed the shell prompt to keep code highlighting working. In this example, ~spawn~ is a function that takes one argument -- a function to execute in a new process. The /act/ of applying ~spawn~ also returns a PID - a process id (again, just like processes running on your computer.)
+
+Elixir provides further abstractions for interfacing with processes; from what I've gathered it's more likely you'd be operating with things like "Agents" (a tool for managing state in processes easier) and "Tasks" which sort of wrap around ~spawn~ to make it easier to report errors and manage the call-response between actors.
+
+Let's keep things pretty low level and look at just spawn'd processes for now.
+
+#+BEGIN_QUOTE Elixir
+# Spawn a process, storing it's PID in a var
+
+myFirstProcess = spawn(fn ->
+  IO.puts "I'm a processing waiting around for a message."
+  receive do
+    msg -> IO.puts "Got a message! It says: #{inspect msg}"
+  end
+end)
+
+send(myFirstProcess, "Hello Process!")
+#+END_QUOTE
+
+In this example, we are passing an anonymous function to execute in a new process -- it waits around for a message and then prints it; then it ceases to exist.
+
+To keep processes alive, we'd need the function above to recur so that it can continue to wait for, and receive new messages. This post by [[https://blog.codeship.com/concurrency-in-elixir/][codeship]] covers that idea nicely. That's all for now!
 
 _Further reading:_
 
-[[http://www.brianstorti.com/the-actor-model/][The Actor Model]]
-[[http://learnyousomeerlang.com/the-hitchhikers-guide-to-concurrency][The Hitchhiker's Guide to Concurrency]]
-[[https://rocketeer.be/articles/concurrency-in-erlang-scala/][Actors in erlang and scala]]
+- [[http://www.brianstorti.com/the-actor-model/][The Actor Model]]
+[[http://learnyousomeerlang.com/the-hitchhikers-guide-to-concurrency][- The Hitchhiker's Guide to Concurrency]]
+[[https://rocketeer.be/articles/concurrency-in-erlang-scala/][- Actors in erlang and scala]]
+[[https://blog.codeship.com/concurrency-in-elixir/][- Concurrency in Elixir]]
+
 
 *** TODO CSP
 
@@ -387,7 +433,7 @@ TODO
 
 TODO
 
-... Talk about the difficulty of distinguising between the two; different definitions etc.
+- Talk about the difficulty of distinguising between the two; different definitions etc.
 
 #+BEGIN_QUOTE
 The definitions of "concurrency" and "parallelism" sometimes get mixed up, but they are not the same.
