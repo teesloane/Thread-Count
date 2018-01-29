@@ -396,7 +396,7 @@ Elixir provides further abstractions for interfacing with processes; from what I
 
 Let's keep things pretty low level and look at just spawn'd processes for now.
 
-#+BEGIN_QUOTE Elixir
+#+BEGIN_SRC Elixir
 # Spawn a process, storing it's PID in a var
 
 myFirstProcess = spawn(fn ->
@@ -407,18 +407,18 @@ myFirstProcess = spawn(fn ->
 end)
 
 send(myFirstProcess, "Hello Process!")
-#+END_QUOTE
+#+END_SRC
 
 In this example, we are passing an anonymous function to execute in a new process -- it waits around for a message and then prints it; then it ceases to exist.
 
 To keep processes alive, we'd need the function above to recur so that it can continue to wait for, and receive new messages. This post by [[https://blog.codeship.com/concurrency-in-elixir/][codeship]] covers that idea nicely. That's all for now!
 
-_Further reading:_
+*Further reading:*
 
 - [[http://www.brianstorti.com/the-actor-model/][The Actor Model]]
-[[http://learnyousomeerlang.com/the-hitchhikers-guide-to-concurrency][- The Hitchhiker's Guide to Concurrency]]
-[[https://rocketeer.be/articles/concurrency-in-erlang-scala/][- Actors in erlang and scala]]
-[[https://blog.codeship.com/concurrency-in-elixir/][- Concurrency in Elixir]]
+- [[http://learnyousomeerlang.com/the-hitchhikers-guide-to-concurrency][The Hitchhiker's Guide to Concurrency]]
+- [[https://rocketeer.be/articles/concurrency-in-erlang-scala/][Actors in erlang and scala]]
+- [[https://blog.codeship.com/concurrency-in-elixir/][Concurrency in Elixir]]
 
 
 *** TODO CSP
@@ -446,9 +446,7 @@ At the moment of this writing, Crystal has concurrency support but not paralleli
 #+END_QUOTE
 
 ** Research and resources
-- [[threads in c][https://www.thegeekstuff.com/2012/04/create-threads-in-linux/]]
 - diff between [[https://stackoverflow.com/questions/200469/what-is-the-difference-between-a-process-and-a-thread?rq=1][process and a thread]]
 - analogy of [[https://stackoverflow.com/a/5201906/5378196][a friend reading a book]] for describing a thread
 - [[https://computing.llnl.gov/tutorials/pthreads/#Thread][Excellent pthread tutorial]]
-- [[https://github.com/clojure/core.async/blob/master/examples/walkthrough.clj][core async walkthrough]]
 
