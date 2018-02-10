@@ -1,23 +1,25 @@
 ** Table of Contents :TOC_3:
-  - [[#introduction-and-overview][Introduction and Overview]]
-  - [[#why-am-i-writing-this][Why am I writing this?]]
-  - [[#on-whos-authority][On who's authority?]]
-  - [[#starting-definitions---threads-and-procesess][Starting definitions - Threads and Procesess]]
-  - [[#processors][Processors]]
-  - [[#back-to-threads][Back to threads]]
-    - [[#my-first-thread][My first Thread!]]
-    - [[#my-first-program-with-more-than-one-thread][My first program with more than one thread]]
-  - [[#when-would-i-use-threads-why-would-i-want-to-write-a-multi-threaded-program][When would I use threads? Why would I want to write a multi-threaded program?]]
-    - [[#a-shift-towards-parallel-programming-as-a-standard][A shift towards parallel programming as a standard?]]
-  - [[#why-is-it-often-difficult-to-write-multi-threaded-programs][Why is it often difficult to write multi-threaded programs?]]
-    - [[#race-conditions][Race Conditions]]
-    - [[#shared-mutable-state][Shared mutable state]]
-  - [[#concurrency-models-csp-actor-model-stm][Concurrency Models (CSP, Actor Model, STM)]]
-    - [[#actor-model][Actor Model]]
-    - [[#csp][CSP]]
-    - [[#software-transactional-memory][Software Transactional Memory]]
-  - [[#concurrency-vs-paralellism][Concurrency Vs Paralellism]]
-  - [[#research-and-resources][Research and resources]]
+  - [[Introduction and Overview][Introduction and Overview]]
+  - [[Why am I writing this?][Why am I writing this?]]
+  - [[On who's authority?][On who's authority?]]
+  - [[Starting definitions - Threads and Procesess][Starting definitions - Threads and Procesess]]
+  - [[Processors][Processors]]
+  - [[Back to threads][Back to threads]]
+    - [[My first Thread!][My first Thread!]]
+    - [[My first program with more than one thread][My first program with more than one thread]]
+  - [[When would I use threads? Why would I want to write a multi-threaded program?][When would I use threads? Why would I want to write a multi-threaded program?]]
+    - [[A shift towards parallel programming as a standard?][A shift towards parallel programming as a standard?]]
+  - [[Why is it often difficult to write multi-threaded programs?][Why is it often difficult to write multi-threaded programs?]]
+    - [[Race Conditions][Race Conditions]]
+    - [[Shared mutable state][Shared mutable state]]
+  - [[Green Threads][Green Threads]]
+  - [[Concurrency Models (CSP, Actor Model, STM)][Concurrency Models (CSP, Actor Model, STM)]]
+    - [[Actor Model][Actor Model]]
+    - [[CSP][CSP]]
+    - [[Software Transactional Memory][Software Transactional Memory]]
+  - [[Concurrency Vs Paralellism][Concurrency Vs Paralellism]]
+  - [[Research and resources][Research and resources]]
+  - [[Footnotes][Footnotes]]
 
 ** Introduction and Overview
 
@@ -340,6 +342,36 @@ In the example above, we have ~num_rings~ -- a piece of data that stores a numbe
 
 Many programming languages offer abstractions over handling parallel programming. You've already seen syntactic difference in how languages like Go handles concurrency compared to C; but behind these special grammers are powerful ideas and abstractions. Some popular abstractions/methodologies for performing parallel programming include CSP (communicating sequential processing) the Actor model, Software Transactional Memory.
 
+** Green Threads
+
+Before we start looking at different concurrency models and approaches to abstracting multi-thread programming, we should talk about /Green Threads/. Several higher level languages implement multi-thread programming using this notion of "Green Threads". Let's return again to the wikipedia definition of a thread and analyze it more closely:
+
+#+BEGIN_QUOTE
+...a thread of execution is the smallest sequence of programmed instructions that can be managed independently by a scheduler, which is typically a part of the operating system.
+#+END_QUOTE
+
+So it turns out that threads aren't always associated with an operating system: green threads are threads that are not managed by the operating system, instead they are managed by a library or a virtual machine[fn:1]. As far as I can tell, green threads appeared quite a while ago, and "solved" the problem of performing /concurrent/ tasks (not parallel, necessarily), especially in cases where a language couldn't be counted on to make use of the OS's threading mechanisms (recall that different hardware had different threading implementations?). By using green threads, you could be assured that as long as your VM (ie, the JVM, or the Erlang virtual machine) could run on your platform, then you could make use of threading.
+
+Green threads appeared as a library developed by Sun Microsystems. This [[https://stackoverflow.com/questions/5713142/green-threads-vs-non-green-threads][thread]] on stack overflow discusses the difference between green threads and native threads; one commenter posits that green threads are out of date and a thing of the past (contextually, in the world of Java perhaps -- more on this shortly). I followed this (stack overflow) thread to an interesting [[https://docs.oracle.com/cd/E19455-01/806-3461/6jck06gqe/index.html][doc]] from Oracle. The doc chronicles some history of green threads, and also provides some great definitions of multithreading. I'm actively trying not to quote the entire thing right here. But for now, I will cite some interesting notes from the section on the "Many-to-one" model of multi-threading.
+
+In this context, these terms /many-to-one/, /one-to-one/, /many-to-many/ are describing the relationship between threads at the user space and the kernel space. When we're discussing green threads, we're talking about threads that are handled in the [[https://en.wikipedia.org/wiki/User_space][user space]] (I think this means inside a virtual machine -- at least for Java). Green threads as a "many-to-one" relationship describes having several user space threads which then connect with a single kernel thread.
+
+Let's look at an excerpt from the docs:
+
+#+BEGIN_QUOTE
+Implementations of the many-to-one model (many user threads to one kernel thread) allow the application to create any number of threads that can execute concurrently. In a many-to-one (user-level threads) implementation, all threads activity is restricted to user space. Additionally, only one thread at a time can access the kernel, so only one schedulable entity is known to the operating system. As a result, this multithreading model provides limited concurrency and does not exploit multiprocessors. The initial implementation of Java threads on the Solaris system was many-to-one, as shown in the following figure.
+
+[[https://docs.oracle.com/cd/E19455-01/806-3461/6jck06gqk/index.html#ch2mt-41][source]]
+#+END_QUOTE
+
+So, I think that when the previously linked [[https://stackoverflow.com/questions/5713142/green-threads-vs-non-green-threads][stack overflow]] discussion referred to green threads as "out of date", they were perhaps referring to this original many-to-one implementation, which didn't actaully take advantage of _multiple processors_. It's important to note that the many-to-one model enabled  concurrency but not parallelism[fn:2]. Regardless, it appears that Solaris moved away from many-to-one towards many-to-many[fn:3].
+
+I've heard the words "green threads" thrown around especially in newer languages like Go, Rust and Elixir (ok, Erlang isn't new). I'm still sorting out this history, but from what I can tell, the notion of green threads is _not_ old, or out-dated... it's definitely in use--I think it's merely that as of late, newer languages have been built to take advantage of the many-to-many model of green threads; I think that what was outdated was the "many-to-one" threading relationship.
+
+I've found this territory particularly confusing, especially when I hear people talking about "spawning MILLIONS (holy shit!) of threads in Erlang"" and I'm just too darn embarassed (having spit out my coffee in disbelief) to shout back "BUT I THOUGHT IT WAS LIKE, JUST ONE THREAD PER CORE?!" and "DO COMPUTERS RUNNING ERLANG HAVE MILLIONS OF CORES? WHY HAVEN'T THESE COMPUTERS TAKEN OVER YET?", and so on.
+
+Hopefully that's enough of a preface / history to take foward into discussing concurrency models.
+
 ** Concurrency Models (CSP, Actor Model, STM)
 
 Each of these topics could probably warrant a whole book written on them, and so I think I can only afford myself a shallow dive into some examples of these concurrency models (for now).
@@ -450,3 +482,13 @@ At the moment of this writing, Crystal has concurrency support but not paralleli
 - analogy of [[https://stackoverflow.com/a/5201906/5378196][a friend reading a book]] for describing a thread
 - [[https://computing.llnl.gov/tutorials/pthreads/#Thread][Excellent pthread tutorial]]
 
+
+** Footnotes
+
+[fn:3] The detailed history of Java and Solaris is beyond the scope of this doc (and my interests, currently) so I'll just leave a link to this doc [[https://docs.oracle.com/cd/E19455-01/806-3461/6jck06gqe/index.html][here]].
+
+
+[fn:2] While at this point in the doc I still have not defined the difference between concurrency and parallelism (still avoiding the wrath of being wrong on the internet.), I've personally found some that these concepts are unraveling (ha!) and revealing themselves through other related topics (in this case through these concepts of many-to-one, and many-to many relationships between a user space and a kernel space). Particularly, the notion that one can have threading on a single core machine (concurrency via [[http://web.mit.edu/6.031/www/fa17/classes/19-concurrency/#processes_threads_time-slicing][time-slicing]]) becomes more apparent in this case.
+
+
+[fn:1] https://en.wikipedia.org/wiki/Green_threads
