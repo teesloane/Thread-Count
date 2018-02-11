@@ -468,12 +468,6 @@ TODO
 
 I *highly recommend* reading [this chapter](https://www.braveclojure.com/concurrency/) on concurrency from the "Clojure for the Brave and True" book.
 
-# Research and resources
-
--   diff between [process and a thread](https://stackoverflow.com/questions/200469/what-is-the-difference-between-a-process-and-a-thread?rq=1)
--   analogy of [a friend reading a book](https://stackoverflow.com/a/5201906/5378196) for describing a thread
--   [Excellent pthread tutorial](https://computing.llnl.gov/tutorials/pthreads/#Thread)
-
 
 # Footnotes
 
