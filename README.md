@@ -82,7 +82,7 @@ There's a lot of information we can glean from these screenshots (especially if 
 
 `Processes: 391 total, 2 running, 389 sleeping, 2309 threads`
 
-Hmm, I just quit my twitter client and now I have this: 
+Hmm, I just quit my twitter client and now I have this:
 
 `Processes: 389 total, 3 running, 386 sleeping, 2296 threads`.
 
@@ -93,7 +93,7 @@ Hmm (pt 2!): I just quit a project I was working on where I had a terminal pane 
 Alright, alright, contrived / heavy handed examples aside! We have deduced that the things running on your computer are *Processes* &#x2013; your browser, your twitter client, your code editor, your terminal, everything you interact with &#x2013; All processes! As Wikipedia puts it:
 
 > A computer program is a passive collection of instructions, while a process is the actual execution of those instructions.
-> 
+>
 > -   [Process (computing)](https://en.wikipedia.org/wiki/Process_(computing))
 
 We're talking about LIVING, BREATHING, PROCESSES PEOPLE. It's beautiful. Processes are identified by a `PID` &#x2013; a process id. Have you ever had to force quit a program? Maybe your browser froze, so you opened your task manager or activity monitor and forced a process to end. The equivalent of doing that in the terminal is to send a message to kill a process. If I type `kill 93835` it's going to kill something &#x2013; Google Chrome to be exact (or at least, *a tab in google chrome* becasue each tab lives in it's *own* process).
@@ -205,14 +205,14 @@ Let's address some possible questions from the code above.
 Pthreads are POSIX threads &#x2013; threads that adhere to the POSIX standard. I think the following [in-depth tutorial](https://computing.llnl.gov/tutorials/pthreads/#Pthread) does a good job summarizing what that means:
 
 > "Historically, hardware vendors have implemented their own proprietary versions of threads. These implementations differed substantially from each other making it difficult for programmers to develop portable threaded applications. [&#x2026;] Most hardware vendors now offer Pthreads in addition to their proprietary API's."
-> 
+>
 > -   [POSIX Threads Programming](https://computing.llnl.gov/tutorials/pthreads/#Pthread)
 
 **What are the params for `pthread` create doing?**
 
 If you go to your terminal and type `man pthread` you can see a detailed manual for `pthread`. If we look for the pthread create function we find:
 
-    
+
     Thread Routines
        int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine)(void *), void *arg)
                Creates a new thread of execution.
@@ -259,13 +259,13 @@ In general, multi-core programming has been gaining a lot of interest (as well a
 
 > "If you’re a software developer, chances are that you have already been riding the “free lunch” wave of desktop computer performance. Is your application’s performance borderline for some local operations? “Not to worry,” the conventional (if suspect) wisdom goes; “tomorrow’s processors will have even more throughput, and anyway today’s applications are increasingly throttled by factors other than CPU throughput and memory speed (e.g., they’re often I/O-bound, network-bound, database-bound).” Right?
 > Right enough, in the past. But dead wrong for the foreseeable future.
-> 
+>
 > The good news is that processors are going to continue to become more powerful. The bad news is that, at least in the short term, the growth will come mostly in directions that do not take most current applications along for their customary free ride.
-> 
+>
 > [&#x2026;]
-> 
+>
 > Starting today, the performance lunch isn’t free any more. Sure, there will continue to be generally applicable performance gains that everyone can pick up, thanks mainly to cache size improvements. But if you want your application to benefit from the continued exponential throughput advances in new processors, it will need to be a well-written concurrent (usually multithreaded) application. And that’s easier said than done, because not all problems are inherently parallelizable and because concurrent programming is hard.
-> 
+>
 > -   <https://www.cs.utexas.edu/~lin/cs380p/Free_Lunch.pdf>
 
 Stutter's paper was written in 2005; it's interesting to read [discussions](https://softwareengineering.stackexchange.com/questions/212916/is-the-free-lunch-over) and [reflections](http://henrikeichenhardt.blogspot.ca/2013/06/free-lunch-for-programers.html) on it, especially years later. Katherine Kox's recently publised book "Concurrency in Go" launches right into these topics within the first chapter with the title "Moore’s Law, Web Scale, and the Mess We’re In". The chapter provides a succinct and descriptive summary of the history of Moore's law and how it relates to concurrency and parallel programming today.
@@ -339,7 +339,7 @@ In this context, these terms *many-to-one*, *one-to-one*, *many-to-many* are des
 Let's look at an excerpt from the docs:
 
 > Implementations of the many-to-one model (many user threads to one kernel thread) allow the application to create any number of threads that can execute concurrently. In a many-to-one (user-level threads) implementation, all threads activity is restricted to user space. Additionally, only one thread at a time can access the kernel, so only one schedulable entity is known to the operating system. As a result, this multithreading model provides limited concurrency and does not exploit multiprocessors. The initial implementation of Java threads on the Solaris system was many-to-one, as shown in the following figure.
-> 
+>
 > [source](https://docs.oracle.com/cd/E19455-01/806-3461/6jck06gqk/index.html#ch2mt-41)
 
 So, I think that when the previously linked [stack overflow](https://stackoverflow.com/questions/5713142/green-threads-vs-non-green-threads) discussion referred to green threads as "out of date", they were perhaps referring to this original many-to-one implementation, which didn't actaully take advantage of <span class="underline">multiple processors</span>. It's important to note that the many-to-one model enabled  concurrency but not parallelism<sup><a id="fnr.2" class="footref" href="#fn.2">2</a></sup>. Regardless, it appears that Solaris moved away from many-to-one towards many-to-many<sup><a id="fnr.3" class="footref" href="#fn.3">3</a></sup>.
@@ -355,8 +355,9 @@ Hopefully that's enough of a preface / history to take foward into discussing co
 
 Each of these topics could probably warrant a whole book written on them, and so I think I can only afford myself a shallow dive into some examples of these concurrency models (for now).
 
-At the very least, let's look at a) some brief history/descriptions of each concurrency model and b) find some basic code examples.
+Furthermore, I'm finding it quite challenging to find examples that employ these concurrency models; in fact I'd argue that without having a concrete, practical reason / problem you are trying to solve, a context-less example can remain quite confusing - and perhaps even serve to confuse more than clarify. I think I'm at a point in this material where I need to actually be solving a problem and _learning by doing_ to gather a better understanding of these concepts. I think that without an actual puzzle to _solve_; a problem to actually experience being stuck on, well, we can only go so far.
 
+At the very least, let's look at a) some brief history/descriptions of each concurrency model and b) find some basic code examples.
 
 ## Actor Model
 
@@ -373,7 +374,7 @@ Neat. I've just noticed the mention of the word "lock" now, which seems to be so
 This post ["The actor model in 10 minutes"](http://www.brianstorti.com/the-actor-model/) kicks off by stating that:
 
 > An actor is the primitive unit of computation. It’s the thing that receives a message and do some kind of computation based on it.
-> 
+>
 > The idea is very similar to what we have in object-oriented languages: An object receives a message (a method call) and do something depending on which message it receives (which method we are calling).
 > The main difference is that actors are completely isolated from each other and they will never share memory. It’s also worth noting that an actor can maintain a private state that can never be changed directly by another actor.
 
@@ -382,7 +383,7 @@ This idea of actors as "primitive" units of &#x2026; *something*, makes me feel 
 Here's an intriguing excerpt from the elixir docs on getting started with [processes and concurrency](https://elixir-lang.org/getting-started/processes.html):
 
 > In Elixir, all code runs inside processes. Processes are isolated from each other, run concurrent to one another and communicate via message passing. Processes are not only the basis for concurrency in Elixir, but they also provide the means for building distributed and fault-tolerant programs.
-> 
+>
 > Elixir’s processes should not be confused with operating system processes. Processes in Elixir are extremely lightweight in terms of memory and CPU (unlike threads in many other programming languages). Because of this, it is not uncommon to have tens or even hundreds of thousands of processes running simultaneously
 
 It's particularly interesting that we are not working with concurrency by using something directly corresponding to the hardware of a computer (ie; posix threads). These "processes", which although they sound similar to thread, are existing only inside the Erlang virtual machine. It's easy to mix up processes in Elixir vs the processes discussed earlier, so I'll try my best not to do so.
@@ -427,7 +428,28 @@ To keep processes alive, we'd need the function above to recur so that it can co
 
 ## CSP
 
-TODO
+CSP stands for communcating sequential processes. It was first brought about in the late 70's by Tony Hoare. I was surprised to find that it was rooted in mathematics, even having it's own notations for describing processes that are non-deterministic. The CSP history link listed below in "Further Reading" digs into a lot of this. It appears that in general, several different concurrent practices are rooted in mathematical theory — CSP deriving from "process calculi" <sup><a id="fnr.4" class="footref" href="#fn.4">4</a></sup>.
+
+Let's remain in the programming world. At a high level, CSP is similar to the Actor model -- it's based on message passing but uses "channels" for communicating messages -- so the idea of an "Actor" sort of still exists, but they do not have identities (like the PID of actors). The use of channels involves **putting** and **taking** messages onto / off of them. Let's look at an example:
+
+TODO -- core.async example.
+
+
+For a fun exploration of CSP in Clojure, check out *Clojure for the Brave and True*, which has an [excellent](https://www.braveclojure.com/core-async/) chapter on core.async. I'd recommend checking it out if you're curious about some more concrete (and funny) examples than I'm able to provide currently. On the Go side of the CSP world, this [video](https://www.youtube.com/watch?v=f6kdp27TYZs) demonstrates the powers of concurrency in Go (by one of the creators of Go, Rob Pike).
+
+
+**Further Reading**
+
+-  Some CSP [history](https://cs.stanford.edu/people/eroberts/courses/soco/projects/2008-09/tony-hoare/csp.html)(Stanford)
+- Crystal Langs [docs on concurrency](https://crystal-lang.org/docs/guides/concurrency.html).
+- [Clojure core.async and Go: A Code Comparison](https://blog.drewolson.org/clojure-go-comparison/)
+- [Go Concurrency Patterns (video)](https://www.youtube.com/watch?v=f6kdp27TYZs)
+
+From the Go FAQ:
+
+- ["Why build concurrency on the ideas of CSP"](https://golang.org/doc/faq#csp)
+- ["why goroutines instead of threads"](https://golang.org/doc/faq#goroutines)
+
 
 
 ## Software Transactional Memory
@@ -436,18 +458,15 @@ TODO
 
 # Concurrency Vs Paralellism
 
-TODO
-
-- Talk about the difficulty of distinguising between the two; different definitions etc.
-
 > The definitions of "concurrency" and "parallelism" sometimes get mixed up, but they are not the same.
-> 
+>
 > A concurrent system is one that can be in charge of many tasks, although not necessarily it is executing them at the same time. You can think of yourself being in the kitchen cooking: you chop an onion, put it to fry, and while it's being fried you chop a tomato, but you are not doing all of those things at the same time: you distribute your time between those tasks. Parallelism would be to stir fry onions with one hand while with the other one you chop a tomato.
-> 
+>
 > At the moment of this writing, Crystal has concurrency support but not parallelism: several tasks can be executed, and a bit of time will be spent on each of these, but two code paths are never executed at the same exact time.
-> 
+>
 > -   <https://crystal-lang.org/docs/guides/concurrency.html>
 
+I *highly recommend* reading [this chapter](https://www.braveclojure.com/concurrency/) on concurrency from the "Clojure for the Brave and True" book.
 
 # Research and resources
 
@@ -463,3 +482,5 @@ TODO
 <sup><a id="fn.2" href="#fnr.2">2</a></sup> While at this point in the doc I still have not defined the difference between concurrency and parallelism (still avoiding the wrath of being wrong on the internet.), I've personally found some that these concepts are unraveling (ha!) and revealing themselves through other related topics (in this case through these concepts of many-to-one, and many-to many relationships between a user space and a kernel space). Particularly, the notion that one can have threading on a single core machine (concurrency via [time-slicing](http://web.mit.edu/6.031/www/fa17/classes/19-concurrency/#processes_threads_time-slicing)) becomes more apparent in this case.
 
 <sup><a id="fn.3" href="#fnr.3">3</a></sup> The detailed history of Java and Solaris is beyond the scope of this doc (and my interests, currently) so I'll just leave a link to this doc [here](https://docs.oracle.com/cd/E19455-01/806-3461/6jck06gqe/index.html).
+
+<sup><a id="fn.4" href="#fnr.4">4</a></sup> source: https://en.wikipedia.org/wiki/Communicating_sequential_processes . I absolutely will not explore this in this document.
